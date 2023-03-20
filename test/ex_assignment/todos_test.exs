@@ -59,5 +59,10 @@ defmodule ExAssignment.TodosTest do
       todo = todo_fixture()
       assert %Ecto.Changeset{} = Todos.change_todo(todo)
     end
+
+    test "get_recommended/0 returns the recommended todo" do
+      todo = todo_fixture(%{done: false})
+      assert Todos.get_recommended() == todo
+    end
   end
 end
