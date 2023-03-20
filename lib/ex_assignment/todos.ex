@@ -6,6 +6,7 @@ defmodule ExAssignment.Todos do
   import Ecto.Query, warn: false
   alias ExAssignment.Repo
 
+  alias ExAssignment.Helper
   alias ExAssignment.Todos.Todo
 
   @doc """
@@ -42,14 +43,26 @@ defmodule ExAssignment.Todos do
   @doc """
   Returns the next todo that is recommended to be done by the system.
 
-  ASSIGNMENT: ...
+
   """
-  def get_recommended() do
-    list_todos(:open)
-    |> case do
-      [] -> nil
-      todos -> Enum.take_random(todos, 1) |> List.first()
-    end
+  @spec get_recommended(list(%Todo{})) :: %Todo{} | nil
+  def get_recommended([]), do: nil
+  def get_recommended(list) when length(list) == 1, do: list |> List.first()
+
+  def get_recommended(todos), do: select_recommended(Helper.total_points(todos), todos)
+
+  # if all are equally important (100%), select one randomly
+  defp select_recommended(0, list), do: list |> Enum.take_random(1) |> List.first()
+
+  defp select_recommended(total_points, todos) do
+    random = 1 - :rand.uniform()
+
+    {todo, _} =
+      total_points
+      |> Helper.get_probabilities(todos)
+      |> Enum.find(fn {_, probability} -> probability >= random end)
+
+    todo
   end
 
   @doc """
