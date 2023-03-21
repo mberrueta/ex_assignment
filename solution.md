@@ -48,6 +48,7 @@ open http://localhost:4000
 
 - allow a negative priority [IMPORTANT]
 - lack if test for recommendations [IMPORTANT]
+- Check errors checking/unchecking todos in Repo [IMPORTANT]
 - credo could be good to analyze a bit the code [MEDIUM]
 - test fixture can use `ex_machina` to generate more random data [LOW]
 - tests can use `excoveralls` [LOW]
@@ -93,3 +94,10 @@ recommended_todo = Todos.get_recommended()
     end
   end
 ```
+
+Moved calc logics to a helper.
+
+## Exercise 2
+
+A cache can solve the problem. Since is not much data I will use just a `GenServer` memory.
+If this were high load used we can use `ETS` (probably with a `ttl`) or even `Redis`

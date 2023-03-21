@@ -1,13 +1,13 @@
 defmodule ExAssignmentWeb.TodoController do
   use ExAssignmentWeb, :controller
 
-  alias ExAssignment.Todos
+  alias ExAssignment.{Cache, Todos}
   alias ExAssignment.Todos.Todo
 
   def index(conn, _params) do
     open_todos = Todos.list_todos(:open)
     done_todos = Todos.list_todos(:done)
-    recommended_todo = open_todos |> Todos.get_recommended()
+    recommended_todo = Cache.get_recommended()
 
     render(conn, :index,
       open_todos: open_todos,
@@ -61,6 +61,7 @@ defmodule ExAssignmentWeb.TodoController do
   def delete(conn, %{"id" => id}) do
     todo = Todos.get_todo!(id)
     {:ok, _todo} = Todos.delete_todo(todo)
+    Cache.remove(id)
 
     conn
     |> put_flash(:info, "Todo deleted successfully.")
@@ -69,6 +70,7 @@ defmodule ExAssignmentWeb.TodoController do
 
   def check(conn, %{"id" => id}) do
     :ok = Todos.check(id)
+    :ok = Cache.remove(id)
 
     conn
     |> redirect(to: ~p"/todos")
